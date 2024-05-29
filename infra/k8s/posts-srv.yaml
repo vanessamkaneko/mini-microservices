@@ -1,0 +1,21 @@
+# POSTS SERVICE
+apiVersion: v1
+kind: Service
+metadata: 
+  name: posts-srv
+spec:
+  type: NodePort
+  selector: 
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+
+# aqui, com o selector app:posts, estamos dizendo ao Service p/ tentar encontrar todos os pods
+# com a label = app posts e os expor p/ o tráfego/mundo externo
+# port: se refere ao Node Port Service (pois o Node terá sua própria port)
+# targetPort: se refere a port que está associado a aplicação rodando no container (o qual está rodando dentro do pod)
+# port e targetPort não precisam ser iguais (caso seja feita uma request p/ o node port service, o Service irá redirecionar esse tráfego
+# para a port do container); porém, o usual é que sejam iguais

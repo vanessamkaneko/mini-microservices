@@ -1,0 +1,65 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: vanessavmk/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: 'src/**/*.js'
+            dest: .
+    - image: vanessavmk/comments
+      context: comments
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: '*.js'
+            dest: .
+    - image: vanessavmk/event-bus
+      context: event-bus
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: '*.js'
+            dest: .
+    - image: vanessavmk/moderation
+      context: moderation
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: '*.js'
+            dest: .
+    - image: vanessavmk/posts
+      context: posts
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: '*.js'
+            dest: .
+    - image: vanessavmk/query
+      context: query
+      docker:
+        dockerfile: Dockerfile
+      sync: 
+        manual: 
+          - src: '*.js'
+            dest: .
+
+# ./infra/k8s/* #todas as config files desta pasta serão monitoradas pelo skaffold -> sempre que sofrerem alteração, skaffold irá automaticamente reaplicar o config file no cluster
+# CONSIDERANDO A PRIMEIRA IMAGE: a sessão artifacts diz ao skaffold sobre algo no projeto que ele precisa manter -> no caso, está dizendo sobre um pod que está rodando... 
+#... fora da pasta client dentro do nosso projeto ---> sempre que tiver alteração dentro da pasta client, skaffold irá tentar pegar essas...
+#... alterações e atualizar o pod ---> se um arquivo js for alterado (indicado aqui src/**/*.js), skaffold irá pegá-lo e copiá-lo no pod...
+# se algum outro doc dentro da pasta client for alterado e este não for compatível com o src, então o skaffold tentará rebuildar a image inteira (tendo a pasta client como base), atualizando na cluster
+# ocorrerá a mesma coisa p/ as outras pastas, a diferença é que não possuem a pasta src, por isso o src é apenas '*.js'

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: query-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: query
+  template:
+    metadata:
+      labels:
+        app: query
+    spec: 
+      containers:
+        - name: query
+          image: vanessavmk/query
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: query-srv
+spec:
+  selector: 
+    app: query # pods que receberão as requests serão os que tem a label = app query
+  # type: ClusterIP -> colocar esta linha é opcional pois por padrão já é estabelecido o Service como type: ClusterIP
+  ports: 
+    - name: query
+      protocol: TCP
+      port: 4002
+      targetPort: 4002

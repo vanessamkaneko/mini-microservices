@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: posts.com
+      http:
+        paths:
+          - path: /posts/create
+            pathType: Prefix
+            backend:
+              service:
+                name: posts-clusterip-srv
+                port:
+                  number: 4000
+          - path: /posts
+            pathType: Prefix
+            backend:
+              service:
+                name: query-srv
+                port:
+                  number: 4002
+          - path: /posts/?(.*)/comments
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: comments-srv
+                port:
+                  number: 4001
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000
+            
+                  
+
+# este doc irá dizer ao ingress controller que as routing rules estão estabelecidas aqui
+# todas as requests que forem feitas para um caminho com /posts/create serão redirecionadas para a ClusterIP do posts (o mesmo com os outros)
+# a fim de que o posts.com/posts aponte para o localhost e não para alguma page de mesmo nome na internet, fizemos um pequeno truque:
+# na caminho C:\Windows\System32\Drivers\etc\hosts, adicionamos 127.0.0.1 posts.com ao final do doc hosts, fazendo com que sempre que acessamos
+# posts.com, será conecatado a nossa máquina local (apenas para fins de desenvolvimento!!!)
+# - path: /posts/?(.*)/comments -> qualquer caminho que começar com /posts e terminar com /comments cairá aqui
+# os paths estão ordenados de acordo com a importância: mais importantes primeiro, pois o último path só será acessado se nenhum dos paths
+# anteriores forem alcançados

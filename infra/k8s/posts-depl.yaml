@@ -1,0 +1,37 @@
+# POSTS DEPLOYMENT
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: posts-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts
+  template:
+    metadata:
+      labels:
+        app: posts
+    spec: 
+      containers:
+        - name: posts
+          image: vanessavmk/posts
+
+# o selector e o metadata-labels (linha 12) é para indicar ao Deployment quais Pods ele precisa gerenciar:
+# selector: indica p/ o Deployment verificar todos os Pods e encontrar aqueles que possuem o label = app posts, administrando-os
+# template: é onde especificamos a config exata de um Pod que queremos que o Deployment crie... Então estamos dizendo que queremos que um Pod tenha a label = app posts
+
+# pensar no selector e no label como se fossem identificadores! (funcionando de maneira parecida as classes html)
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: posts-clusterip-srv
+spec:
+  selector: 
+    app: posts 
+  ports: 
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000

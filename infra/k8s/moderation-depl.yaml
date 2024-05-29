@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: moderation-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moderation
+  template:
+    metadata:
+      labels:
+        app: moderation
+    spec: 
+      containers:
+        - name: moderation
+          image: vanessavmk/moderation
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: moderation-srv
+spec:
+  selector: 
+    app: moderation # pods que receberão as requests serão os que tem a label = app moderation
+  # type: ClusterIP -> colocar esta linha é opcional pois por padrão já é estabelecido o Service como type: ClusterIP
+  ports: 
+    - name: moderation
+      protocol: TCP
+      port: 4003
+      targetPort: 4003

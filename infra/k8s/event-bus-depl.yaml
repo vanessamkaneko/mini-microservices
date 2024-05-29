@@ -1,0 +1,33 @@
+# EVENT-BUS DEPLOYMENT
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: event-bus-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-bus
+  template:
+    metadata:
+      labels:
+        app: event-bus
+    spec: 
+      containers:
+        - name: event-bus
+          image: vanessavmk/event-bus
+---
+# EVENT-BUS SERVICE
+apiVersion: v1
+kind: Service
+metadata: 
+  name: event-bus-srv
+spec:
+  selector: 
+    app: event-bus # pods que receberão as requests serão os que tem a label = app event-bus
+  # type: ClusterIP -> colocar esta linha é opcional pois por padrão já é estabelecido o Service como type: ClusterIP
+  ports: 
+    - name: event-bus
+      protocol: TCP
+      port: 4005
+      targetPort: 4005
